@@ -10,3 +10,11 @@ A lightweight, real-time group chat web application built using PHP, MySQL, and 
 - Stores chat messages in MySQL
 - User joins with a name (no login required)
 - Responsive design for mobile & desktop
+
+-------------------------------------------------------------------------------------------------------------
+
+# 🛠️ Tech Stack
+- Frontend: HTML, CSS, JavaScript (AJAX)
+- Backend: PHP (vanilla)
+- Database: MySQL
+- Hosting Compatibility: Works with any PHP-enabled hosting InfinityFree.
