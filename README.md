@@ -22,20 +22,12 @@ A lightweight, real-time group chat web application built using PHP, MySQL, and 
 ----------------------------------------------------------------------------------------------------------------
 
 🧑‍💻 How to Run Locally
-Clone the Repository
+1. Clone the Repository
 git clone https://github.com/yourusername/chat-app.git
 cd chat-app
-Setup MySQL Database
-Create a database, e.g., chatapp
-Run the following SQL to create the table:
-CREATE TABLE messages (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(50),
-  message TEXT,
-  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-Update db_config.php
-$conn = mysqli_connect("localhost", "your_user", "your_password", "chatapp");
+
+---------------------------------------------------------------------------------------------------------------
+
 Launch in Browser
 Open index.html in your browser (or host it on a local server like XAMPP).
 Start chatting!
