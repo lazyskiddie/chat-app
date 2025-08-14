@@ -35,8 +35,9 @@
       flex: 1;
       padding: 10px;
       overflow-y: auto;
-      background-image: url('https://www.whatsapp.com/img/bg-chat-tile-dark_a4a55f50c7e19d3c7c354b7e49fd4401.png');
+      background-image: url('https://plus.unsplash.com/premium_photo-1675826774817-fe983ceb0475?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
       background-repeat: repeat;
+      background-size: cover;
     }
     .chat-box p {
       margin: 6px 0;
@@ -74,9 +75,64 @@
     .chat-input button:hover {
       background-color: #1ebe5d;
     }
+
+    /* Popup Styles */
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .popup {
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 90%;
+      max-width: 300px;
+    }
+    .popup h2 {
+      color: white;
+      margin-bottom: 15px;
+    }
+    .popup input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #555;
+      background-color: #2a2a2a;
+      color: white;
+    }
+    .popup button {
+      background: #25D366;
+      border: none;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .popup button:hover {
+      background: #1ebe5d;
+    }
   </style>
 </head>
 <body>
+  <!-- Popup for user details -->
+  <div id="popup-overlay" class="popup-overlay" style="display:none;">
+    <div class="popup">
+      <h2>Enter Details</h2>
+      <input type="text" id="popup-name" placeholder="Enter your Name" />
+      <input type="text" id="popup-enrol" placeholder="Enter Enrollment No." />
+      <button onclick="saveUserDetails()">Submit</button>
+    </div>
+  </div>
+
   <div class="chat-container">
     <div class="chat-header">
       <center><h3>Group Chat (AMTICS)</h3></center>
@@ -86,12 +142,35 @@
     </div>
     <div id="chat-box" class="chat-box"></div>
     <div class="chat-input">
+      <input type="hidden" id="sender" value="" />
       <input type="text" id="messageInput" placeholder="Message" />
       <button onclick="sendMessage()">➤</button>
     </div>
   </div>
+
   <script>
     const chatBox = document.getElementById("chat-box");
+    let sender = localStorage.getItem("chatSender");
+
+    // Show popup if no sender stored
+    if (!sender) {
+      document.getElementById("popup-overlay").style.display = "flex";
+    } else {
+      document.getElementById("sender").value = sender;
+    }
+
+    function saveUserDetails() {
+      const name = document.getElementById("popup-name").value.trim();
+      const enrol = document.getElementById("popup-enrol").value.trim();
+      if (!name || !enrol) {
+        alert("Please enter both Name and Enrollment No.");
+        return;
+      }
+      sender = `${name}_${enrol}`;
+      localStorage.setItem("chatSender", sender);
+      document.getElementById("sender").value = sender;
+      document.getElementById("popup-overlay").style.display = "none";
+    }
 
     function loadMessages() {
       fetch('fetch.php')
@@ -110,11 +189,12 @@
     function sendMessage() {
       const input = document.getElementById("messageInput");
       const msg = input.value.trim();
-      if (!msg) return;
+      const senderVal = document.getElementById("sender").value;
+      if (!msg || !senderVal) return;
 
       const formData = new FormData();
       formData.append("message", msg);
-      formData.append("sender", "You");
+      formData.append("sender", senderVal);
 
       fetch("send.php", {
         method: "POST",
