@@ -156,6 +156,9 @@
   </style>
 </head>
 <body>
+  <!-- 🔔 Sound alert -->
+  <audio id="notifySound" src="https://www.soundjay.com/button/sounds/button-37.mp3" preload="auto"></audio>
+
   <div id="popup-overlay" class="popup-overlay" style="display:none;">
     <div class="popup">
       <h2>Enter Details</h2>
@@ -186,12 +189,18 @@
     const chatBox = document.getElementById("chat-box");
     const emojiPicker = document.getElementById("emoji-picker");
     const inputField = document.getElementById("messageInput");
+    const notifySound = document.getElementById("notifySound"); // 🔔 sound
     let sender = localStorage.getItem("chatSender");
+    let lastMessageId = 0; 
 
     if (!sender) {
       document.getElementById("popup-overlay").style.display = "flex";
     } else {
       document.getElementById("sender").value = sender;
+    }
+
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
     }
 
     function saveUserDetails() {
@@ -218,6 +227,22 @@
             chatBox.appendChild(p);
           });
           chatBox.scrollTop = chatBox.scrollHeight;
+
+          if (data.length > 0) {
+            const latest = data[data.length - 1];
+            if (latest.id > lastMessageId && latest.sender !== sender) {
+              // Browser notification
+              if (Notification.permission === "granted") {
+                new Notification("New Message", {
+                  body: `${latest.sender}: ${latest.message}`,
+                  icon: "https://cdn-icons-png.flaticon.com/512/1384/1384005.png"
+                });
+              }
+              // Play sound
+              notifySound.play().catch(err => console.log("Autoplay blocked:", err));
+            }
+            lastMessageId = latest.id;
+          }
         });
     }
 
@@ -247,19 +272,16 @@
       emojiPicker.style.display = emojiPicker.style.display === "none" ? "block" : "none";
     }
 
-    // Hide emoji picker when clicking outside
     document.addEventListener("click", function(e) {
       if (!emojiPicker.contains(e.target) && !e.target.classList.contains("emoji-btn")) {
         emojiPicker.style.display = "none";
       }
     });
 
-    // Add emoji to input
     emojiPicker.addEventListener("emoji-click", event => {
       inputField.value += event.detail.unicode;
     });
 
-    // 🔑 Fix: keep input visible when keyboard opens
     inputField.addEventListener("focus", () => {
       setTimeout(() => {
         inputField.scrollIntoView({ behavior: "smooth", block: "center" });
